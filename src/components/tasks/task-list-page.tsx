@@ -45,7 +45,9 @@ export async function TaskListPage({ task, category }: { task: TaskKey; category
   }
 
   const taskConfig = getTaskConfig(task)
-  const posts = await fetchTaskPosts(task, 30)
+  const posts = await fetchTaskPosts(task, 30, {
+    allowMockFallback: task === 'sbm' || task === 'social',
+  })
   const normalizedCategory = category ? normalizeCategory(category) : 'all'
   const intro = taskIntroCopy[task]
   const baseUrl = SITE_CONFIG.baseUrl.replace(/\/$/, '')
@@ -61,6 +63,7 @@ export async function TaskListPage({ task, category }: { task: TaskKey; category
   const Icon = taskIcons[task] || LayoutGrid
 
   const isDark = ['image-masonry', 'image-portfolio', 'profile-creator'].includes(layoutKey)
+  const isCurationTask = task === 'sbm' || task === 'social' || task === 'pdf'
   const ui = isDark
     ? {
         muted: 'text-slate-300',
@@ -69,13 +72,13 @@ export async function TaskListPage({ task, category }: { task: TaskKey; category
         input: 'border-white/10 bg-white/6 text-white',
         button: 'bg-white text-slate-950 hover:bg-slate-200',
       }
-    : layoutKey.startsWith('article') || layoutKey.startsWith('sbm')
+    : layoutKey.startsWith('article') || layoutKey.startsWith('sbm') || isCurationTask
       ? {
-          muted: 'text-[#72594a]',
-          panel: 'border border-[#dbc6b6] bg-white/90',
-          soft: 'border border-[#dbc6b6] bg-[#fff8ef]',
-          input: 'border border-[#dbc6b6] bg-white text-[#2f1d16]',
-          button: 'bg-[#2f1d16] text-[#fff4e4] hover:bg-[#452920]',
+          muted: 'text-[#5f6650]',
+          panel: 'border border-[#d5ddc1] bg-white/90',
+          soft: 'border border-[#d5ddc1] bg-[#f7f3df]',
+          input: 'border border-[#d5ddc1] bg-white text-[#27301f]',
+          button: 'bg-[#27301f] text-[#fbf7eb] hover:bg-[#37462b]',
         }
       : {
           muted: 'text-slate-600',
@@ -120,6 +123,88 @@ export async function TaskListPage({ task, category }: { task: TaskKey; category
           />
         ) : null}
 
+        {task === 'sbm' || task === 'social' ? (
+          <section className="mb-12">
+            <div className={`rounded-[2.25rem] p-8 shadow-[0_24px_70px_rgba(73,88,50,0.08)] ${ui.panel}`}>
+              <div className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.24em] opacity-70">
+                <Icon className="h-4 w-4" /> {taskConfig?.label || task}
+              </div>
+              <h1 className="mt-4 max-w-3xl text-4xl font-semibold tracking-[-0.05em] text-foreground sm:text-5xl">
+                {taskConfig?.description || 'Saved links and bookmarks'}
+              </h1>
+              <p className={`mt-4 max-w-2xl text-sm leading-7 ${ui.muted}`}>
+                Bookmarks work best when the page feels like a board. This layout keeps the primary collection first, then tucks supporting tasks into smaller reference lanes instead of repeating the same feed rhythm.
+              </p>
+              <div className="mt-6 flex flex-wrap gap-3">
+                <Link href="/sbm/submit" className={`inline-flex items-center gap-2 rounded-full px-5 py-3 text-sm font-semibold ${ui.button}`}>
+                  Submit link
+                </Link>
+              </div>
+            </div>
+          </section>
+        ) : null}
+
+        {task === 'pdf' ? (
+          <section className="mb-12 grid gap-6 lg:grid-cols-[0.92fr_1.08fr] lg:items-start">
+            <div className={`rounded-[2.25rem] p-8 shadow-[0_24px_70px_rgba(73,88,50,0.08)] ${ui.panel}`}>
+              <div className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.24em] opacity-70">
+                <Icon className="h-4 w-4" /> {taskConfig?.label || task}
+              </div>
+              <h1 className="mt-4 max-w-3xl text-4xl font-semibold tracking-[-0.05em] text-foreground sm:text-5xl">
+                Document library and downloadable references.
+              </h1>
+              <p className={`mt-4 max-w-2xl text-sm leading-7 ${ui.muted}`}>
+                PDF pages benefit from a utility-first rhythm: compact filters, clear file cues, and a layout that feels like a reference shelf rather than a generic post feed.
+              </p>
+              <div className="mt-6 grid gap-3 sm:grid-cols-3">
+                {['File first', 'Quick access', 'Dense utility'].map((item) => (
+                  <div key={item} className={`rounded-[1.35rem] p-4 ${ui.soft}`}>
+                    <p className="text-xs font-semibold uppercase tracking-[0.2em] opacity-70">{item}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className={`rounded-[2.25rem] p-6 shadow-[0_18px_50px_rgba(73,88,50,0.06)] ${ui.soft}`}>
+              <p className={`text-xs font-semibold uppercase tracking-[0.24em] ${ui.muted}`}>Filter document library</p>
+              <form className="mt-4 grid gap-3 sm:grid-cols-[1fr_auto] sm:items-end" action={taskConfig?.route || '#'}>
+                <div>
+                  <label className={`text-xs uppercase tracking-[0.2em] ${ui.muted}`}>Category</label>
+                  <select name="category" defaultValue={normalizedCategory} className={`mt-2 h-11 w-full rounded-xl px-3 text-sm ${ui.input}`}>
+                    <option value="all">All categories</option>
+                    {CATEGORY_OPTIONS.map((item) => (
+                      <option key={item.slug} value={item.slug}>{item.name}</option>
+                    ))}
+                  </select>
+                </div>
+                <button type="submit" className={`h-11 rounded-xl px-4 text-sm font-medium ${ui.button}`}>Apply</button>
+              </form>
+            </div>
+          </section>
+        ) : null}
+
+        {task === 'article' ? (
+          <section className="mb-12 grid gap-8 lg:grid-cols-[1.08fr_0.92fr] lg:items-start">
+            <div>
+              <p className={`text-xs uppercase tracking-[0.3em] ${ui.muted}`}>{taskConfig?.label || task}</p>
+              <h1 className="mt-3 max-w-4xl text-5xl font-semibold tracking-[-0.05em] text-foreground">{taskConfig?.description || 'Latest posts'}</h1>
+              <p className={`mt-5 max-w-2xl text-sm leading-8 ${ui.muted}`}>Article pages need a slower reading rhythm. This intro uses wider spacing, stronger hierarchy, and a quieter companion panel so the typography gets room to breathe.</p>
+            </div>
+            <div className={`rounded-[2rem] p-6 ${ui.panel}`}>
+              <p className={`text-xs font-semibold uppercase tracking-[0.24em] ${ui.muted}`}>Reading note</p>
+              <p className={`mt-4 text-sm leading-7 ${ui.muted}`}>Use category filters to jump between topics without collapsing the page into the same repeated card rhythm used by the bookmark and document sections.</p>
+              <form className="mt-5 flex items-center gap-3" action={taskConfig?.route || '#'}>
+                <select name="category" defaultValue={normalizedCategory} className={`h-11 flex-1 rounded-xl px-3 text-sm ${ui.input}`}>
+                  <option value="all">All categories</option>
+                  {CATEGORY_OPTIONS.map((item) => (
+                    <option key={item.slug} value={item.slug}>{item.name}</option>
+                  ))}
+                </select>
+                <button type="submit" className={`h-11 rounded-xl px-4 text-sm font-medium ${ui.button}`}>Apply</button>
+              </form>
+            </div>
+          </section>
+        ) : null}
+
         {layoutKey === 'listing-directory' || layoutKey === 'listing-showcase' ? (
           <section className="mb-12 grid gap-6 lg:grid-cols-[1.1fr_0.9fr] lg:items-end">
             <div className={`rounded-[2rem] p-7 shadow-[0_24px_70px_rgba(15,23,42,0.07)] ${ui.panel}`}>
@@ -143,29 +228,6 @@ export async function TaskListPage({ task, category }: { task: TaskKey; category
               </div>
               <button type="submit" className={`h-11 rounded-xl text-sm font-medium ${ui.button}`}>Apply filters</button>
             </form>
-          </section>
-        ) : null}
-
-        {layoutKey === 'article-editorial' || layoutKey === 'article-journal' ? (
-          <section className="mb-12 grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-start">
-            <div>
-              <p className={`text-xs uppercase tracking-[0.3em] ${ui.muted}`}>{taskConfig?.label || task}</p>
-              <h1 className="mt-3 max-w-4xl text-5xl font-semibold tracking-[-0.05em] text-foreground">{taskConfig?.description || 'Latest posts'}</h1>
-              <p className={`mt-5 max-w-2xl text-sm leading-8 ${ui.muted}`}>This reading surface uses slower pacing, stronger typographic hierarchy, and more breathing room so long-form content feels intentional rather than squeezed into a generic feed.</p>
-            </div>
-            <div className={`rounded-[2rem] p-6 ${ui.panel}`}>
-              <p className={`text-xs font-semibold uppercase tracking-[0.24em] ${ui.muted}`}>Reading note</p>
-              <p className={`mt-4 text-sm leading-7 ${ui.muted}`}>Use category filters to jump between topics without collapsing the page into the same repeated card rhythm used by other task types.</p>
-              <form className="mt-5 flex items-center gap-3" action={taskConfig?.route || '#'}>
-                <select name="category" defaultValue={normalizedCategory} className={`h-11 flex-1 rounded-xl px-3 text-sm ${ui.input}`}>
-                  <option value="all">All categories</option>
-                  {CATEGORY_OPTIONS.map((item) => (
-                    <option key={item.slug} value={item.slug}>{item.name}</option>
-                  ))}
-                </select>
-                <button type="submit" className={`h-11 rounded-xl px-4 text-sm font-medium ${ui.button}`}>Apply</button>
-              </form>
-            </div>
           </section>
         ) : null}
 
@@ -215,29 +277,7 @@ export async function TaskListPage({ task, category }: { task: TaskKey; category
           </section>
         ) : null}
 
-        {layoutKey === 'sbm-curation' || layoutKey === 'sbm-library' ? (
-          <section className="mb-12 grid gap-6 lg:grid-cols-[1.15fr_0.85fr] lg:items-start">
-            <div>
-              <p className={`text-xs uppercase tracking-[0.3em] ${ui.muted}`}>{taskConfig?.label || task}</p>
-              <h1 className="mt-3 text-4xl font-semibold tracking-[-0.05em] text-foreground">Curated resources arranged more like collections than a generic post feed.</h1>
-              <p className={`mt-5 max-w-2xl text-sm leading-8 ${ui.muted}`}>Bookmarks, saved resources, and reference-style items need calmer grouping and lighter metadata. This variant gives them that separation.</p>
-            </div>
-            <div className={`rounded-[2rem] p-6 ${ui.panel}`}>
-              <p className={`text-xs uppercase tracking-[0.24em] ${ui.muted}`}>Collection filter</p>
-              <form className="mt-4 flex items-center gap-3" action={taskConfig?.route || '#'}>
-                <select name="category" defaultValue={normalizedCategory} className={`h-11 flex-1 rounded-xl px-3 text-sm ${ui.input}`}>
-                  <option value="all">All categories</option>
-                  {CATEGORY_OPTIONS.map((item) => (
-                    <option key={item.slug} value={item.slug}>{item.name}</option>
-                  ))}
-                </select>
-                <button type="submit" className={`h-11 rounded-xl px-4 text-sm font-medium ${ui.button}`}>Apply</button>
-              </form>
-            </div>
-          </section>
-        ) : null}
-
-        {intro ? (
+        {intro && task !== 'sbm' && task !== 'social' ? (
           <section className={`mb-12 rounded-[2rem] p-6 shadow-[0_18px_50px_rgba(15,23,42,0.06)] sm:p-8 ${ui.panel}`}>
             <h2 className="text-2xl font-semibold text-foreground">{intro.title}</h2>
             {intro.paragraphs.map((paragraph) => (
