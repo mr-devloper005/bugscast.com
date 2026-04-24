@@ -95,17 +95,97 @@ export function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const pathname = usePathname()
   const { isAuthenticated } = useAuth()
-  const { recipe } = getFactoryState()
+  const { recipe, productKind } = getFactoryState()
 
-  const navigation = useMemo(() => SITE_CONFIG.tasks.filter((task) => task.enabled && task.key !== 'profile'), [])
+  const navigation = useMemo(() => SITE_CONFIG.tasks.filter((task) => task.key !== 'profile'), [])
   const primaryNavigation = navigation.slice(0, 5)
+  const primaryTask = SITE_CONFIG.tasks.find((task) => task.key === recipe.primaryTask && task.enabled) || navigation[0]
+  const curationPrimary = primaryTask || navigation.find((task) => task.key === 'sbm') || navigation[0]
   const mobileNavigation = navigation.map((task) => ({
     name: task.label,
     href: task.route,
     icon: taskIcons[task.key] || LayoutGrid,
   }))
-  const primaryTask = SITE_CONFIG.tasks.find((task) => task.key === recipe.primaryTask && task.enabled) || primaryNavigation[0]
   const isDirectoryProduct = recipe.homeLayout === 'listing-home' || recipe.homeLayout === 'classified-home'
+  const isCurationProduct = productKind === 'curation' || recipe.primaryTask === 'sbm'
+
+  if (isCurationProduct) {
+    return (
+      <header className="sticky top-0 z-50 w-full border-b border-[#d8dcc1] bg-[#fbf7eb]/94 text-[#27301f] backdrop-blur-xl lg:fixed lg:inset-y-0 lg:left-0 lg:w-[var(--sbm-rail-width)] lg:border-b-0 lg:border-r">
+        <nav className="mx-auto flex h-20 max-w-7xl items-center justify-between gap-3 px-4 sm:px-6 lg:h-full lg:max-w-none lg:flex-col lg:items-stretch lg:justify-start lg:gap-5 lg:px-5 lg:py-5">
+          <div className="flex min-w-0 items-center gap-3 lg:w-full lg:items-start">
+            <Link href="/" className="flex shrink-0 items-center gap-3">
+              <div className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-[1.25rem] border border-[#d4d9bd] bg-white/80 p-1.5 shadow-sm">
+                <img src="/favicon.png?v=20260401" alt={`${SITE_CONFIG.name} logo`} width="48" height="48" className="h-full w-full object-contain" />
+              </div>
+              <div className="min-w-0">
+                <span className="block truncate text-lg font-semibold tracking-[-0.03em]">{SITE_CONFIG.name}</span>
+              </div>
+            </Link>
+          </div>
+
+          <div className="hidden w-full flex-1 lg:flex lg:flex-col lg:gap-4">
+            <div className="rounded-[1.75rem] border border-[#d6ddc1] bg-[#f7f3df] p-4 shadow-[0_18px_48px_rgba(95,109,67,0.08)]">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[#6d765b]">Latest uploads</p>
+              {curationPrimary ? (
+                <Link href={curationPrimary.route} className="mt-3 flex items-center justify-between rounded-[1.35rem] bg-[#27301f] px-4 py-4 text-white transition hover:bg-[#37462b]">
+                  <div>
+                    <span className="block text-[11px] font-semibold uppercase tracking-[0.22em] text-white/70">Open recent post</span>
+                    <span className="block text-base font-semibold">Latest upload</span>
+                  </div>
+                  <ChevronRight className="h-4 w-4" />
+                </Link>
+              ) : null}
+            </div>
+          </div>
+
+          <div className="flex shrink-0 items-center gap-2 sm:gap-3 lg:w-full lg:flex-col lg:items-stretch">
+            {primaryTask ? (
+              <Link href={primaryTask.route} className="hidden items-center justify-center gap-2 rounded-full bg-[#27301f] px-4 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-[#fbf7eb] transition hover:bg-[#37462b] md:inline-flex lg:flex">
+                <Sparkles className="h-3.5 w-3.5" />
+                {primaryTask.label}
+              </Link>
+            ) : null}
+
+            {isAuthenticated ? (
+              <div className="hidden lg:block">
+                <NavbarAuthControls />
+              </div>
+            ) : (
+              <div className="hidden items-center gap-2 md:flex lg:flex-col lg:items-stretch">
+                <Button variant="ghost" size="sm" asChild className="rounded-full px-4 text-[#44513a] hover:bg-white/60">
+                  <Link href="/login">Sign In</Link>
+                </Button>
+                <Button size="sm" asChild className="rounded-full bg-[#27301f] text-[#fbf7eb] hover:bg-[#37462b]">
+                  <Link href="/sbm/submit">
+                    <Plus className="mr-1 h-4 w-4" />
+                    Submit Link
+                  </Link>
+                </Button>
+              </div>
+            )}
+
+            <Button variant="ghost" size="icon" className="rounded-full lg:hidden" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
+              {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </Button>
+          </div>
+        </nav>
+
+        {isMobileMenuOpen && (
+          <div className="border-t border-[#d6ddc1] bg-[#fbf7eb] lg:hidden">
+            <div className="space-y-3 px-4 py-4 sm:px-6">
+              {curationPrimary ? (
+                <Link href={curationPrimary.route} onClick={() => setIsMobileMenuOpen(false)} className="flex items-center justify-between rounded-[1.15rem] bg-[#27301f] px-4 py-3 text-sm font-semibold text-[#fbf7eb]">
+                  <span>{curationPrimary.label}</span>
+                  <ChevronRight className="h-4 w-4" />
+                </Link>
+              ) : null}
+            </div>
+          </div>
+        )}
+      </header>
+    )
+  }
 
   if (isDirectoryProduct) {
     const palette = directoryPalette[(recipe.brandPack === 'market-utility' ? 'market-utility' : 'directory-clean') as keyof typeof directoryPalette]
@@ -120,7 +200,6 @@ export function Navbar() {
               </div>
               <div className="min-w-0 hidden sm:block">
                 <span className="block truncate text-xl font-semibold">{SITE_CONFIG.name}</span>
-                <span className="block text-[10px] uppercase tracking-[0.24em] opacity-60">{siteContent.navbar.tagline}</span>
               </div>
             </Link>
 

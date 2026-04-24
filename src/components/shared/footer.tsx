@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { FileText, Building2, LayoutGrid, Tag, Github, Twitter, Linkedin, Image as ImageIcon, User, ArrowRight, Sparkles } from 'lucide-react'
+import { FileText, Building2, LayoutGrid, Tag, Image as ImageIcon, User, ArrowRight, Sparkles, ChevronRight, Plus } from 'lucide-react'
 import { SITE_CONFIG, type TaskKey } from '@/lib/site-config'
 import { siteContent } from '@/config/site.content'
 import { getFactoryState } from '@/design/factory/get-factory-state'
@@ -33,9 +33,8 @@ const footerLinks = {
   ],
   resources: [
     { name: 'Help Center', href: '/help' },
-    { name: 'Community', href: '/community' },
-    { name: 'Developers', href: '/developers' },
-    { name: 'Status', href: '/status' },
+    { name: 'About Us', href: '/about' },
+    { name: 'Contact Us', href: '/contact' },
   ],
   legal: [
     { name: 'Privacy', href: '/privacy' },
@@ -44,12 +43,6 @@ const footerLinks = {
     { name: 'Licenses', href: '/licenses' },
   ],
 }
-
-const socialLinks = [
-  { name: 'Twitter', href: 'https://twitter.com', icon: Twitter },
-  { name: 'GitHub', href: 'https://github.com', icon: Github },
-  { name: 'LinkedIn', href: 'https://linkedin.com', icon: Linkedin },
-]
 
 export function Footer() {
   if (FOOTER_OVERRIDE_ENABLED) {
@@ -87,8 +80,8 @@ export function Footer() {
           <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr_1fr]">
             <div className="rounded-[2rem] border border-white/10 bg-white/5 p-7">
               <div className="flex items-center gap-3">
-                <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-white/12 bg-white/8 p-1.5">
-                  <img src="/favicon.png?v=20260401" alt={`${SITE_CONFIG.name} logo`} width="48" height="48" className="h-full w-full object-contain" />
+                <div className="flex h-12 w-16 items-center justify-center overflow-hidden rounded-xl border border-white/12 bg-white px-2">
+                  <img src="/favicon.png?v=20260401" alt={`${SITE_CONFIG.name} logo`} width="64" height="48" className="h-full w-full object-cover" />
                 </div>
                 <div>
                   <p className="text-lg font-semibold">{SITE_CONFIG.name}</p>
@@ -120,16 +113,6 @@ export function Footer() {
                   ))}
                 </ul>
               </div>
-              <div>
-                <h3 className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">Connect</h3>
-                <div className="mt-4 flex gap-3">
-                  {socialLinks.map((item) => (
-                    <Link key={item.name} href={item.href} target="_blank" rel="noopener noreferrer" className="rounded-full border border-white/10 bg-white/8 p-2.5 text-slate-200 hover:bg-white/12 hover:text-white">
-                      <item.icon className="h-4 w-4" />
-                    </Link>
-                  ))}
-                </div>
-              </div>
             </div>
           </div>
           <div className="mt-10 border-t border-white/10 pt-5 text-sm text-slate-400">&copy; {new Date().getFullYear()} {SITE_CONFIG.name}. All rights reserved.</div>
@@ -140,33 +123,57 @@ export function Footer() {
 
   if (recipe.footer === 'editorial-footer') {
     return (
-      <footer className="border-t border-[#dbc6b6] bg-[linear-gradient(180deg,#fff9f0_0%,#fff1df_100%)] text-[#2f1d16]">
-        <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-          <div className="grid gap-10 lg:grid-cols-[1.1fr_0.9fr_0.9fr]">
-            <div>
-              <div className="inline-flex items-center gap-2 rounded-full border border-[#dbc6b6] bg-white px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-[#72594a]">
+      <footer className="border-t border-[#d6ddc1] bg-[linear-gradient(180deg,#fbf7eb_0%,#f3ebd0_100%)] text-[#27301f]">
+        <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
+          <div className="grid gap-8 lg:grid-cols-[1.05fr_0.95fr_0.95fr]">
+            <div className="rounded-[2rem] border border-[#d6ddc1] bg-white/70 p-7 shadow-[0_20px_60px_rgba(73,88,50,0.08)]">
+              <div className="inline-flex items-center gap-2 rounded-full border border-[#d6ddc1] bg-[#f7f3df] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-[#5f6650]">
                 <Sparkles className="h-3.5 w-3.5" />
-                Editorial desk
+                Curated library
               </div>
               <h3 className="mt-5 text-3xl font-semibold tracking-[-0.04em]">{SITE_CONFIG.name}</h3>
-              <p className="mt-4 max-w-md text-sm leading-7 text-[#72594a]">{SITE_CONFIG.description}</p>
+              <p className="mt-4 max-w-md text-sm leading-7 text-[#5f6650]">{SITE_CONFIG.description}</p>
+              <div className="mt-6 flex flex-wrap gap-3">
+                {primaryTask ? (
+                  <Link href={primaryTask.route} className="inline-flex items-center gap-2 rounded-full bg-[#27301f] px-4 py-2.5 text-sm font-semibold text-[#fbf7eb] hover:bg-[#37462b]">
+                    Open {primaryTask.label}
+                    <ArrowRight className="h-4 w-4" />
+                  </Link>
+                ) : null}
+                <Link href="/sbm/submit" className="inline-flex items-center gap-2 rounded-full border border-[#d6ddc1] bg-white px-4 py-2.5 text-sm font-semibold text-[#27301f] hover:bg-[#f7f3df]">
+                  <Plus className="h-4 w-4" />
+                  Submit link
+                </Link>
+              </div>
             </div>
             <div>
-              <h4 className="text-xs font-semibold uppercase tracking-[0.24em] text-[#8b6d5a]">Sections</h4>
+              <h4 className="text-xs font-semibold uppercase tracking-[0.24em] text-[#7b8467]">Secondary lanes</h4>
               <ul className="mt-4 space-y-3 text-sm">
-                {footerLinks.platform.map((item: any) => (
-                  <li key={item.name}><Link href={item.href} className="hover:text-[#2f1d16]">{item.name}</Link></li>
+                {[
+                  { name: 'Articles', href: '/articles' },
+                  { name: 'PDF Library', href: '/pdf' },
+                  { name: 'Community', href: '/community' },
+                ].map((item) => (
+                  <li key={item.name}>
+                    <Link href={item.href} className="flex items-center justify-between rounded-[1.2rem] border border-[#d6ddc1] bg-white/75 px-4 py-3 hover:bg-[#f7f3df]">
+                      <span>{item.name}</span>
+                      <ChevronRight className="h-4 w-4 opacity-70" />
+                    </Link>
+                  </li>
                 ))}
               </ul>
             </div>
             <div>
-              <h4 className="text-xs font-semibold uppercase tracking-[0.24em] text-[#8b6d5a]">Company</h4>
+              <h4 className="text-xs font-semibold uppercase tracking-[0.24em] text-[#7b8467]">Archive</h4>
               <ul className="mt-4 space-y-3 text-sm">
                 {footerLinks.company.map((item) => (
-                  <li key={item.name}><Link href={item.href} className="hover:text-[#2f1d16]">{item.name}</Link></li>
+                  <li key={item.name}><Link href={item.href} className="text-[#5f6650] hover:text-[#27301f]">{item.name}</Link></li>
                 ))}
               </ul>
             </div>
+          </div>
+          <div className="mt-10 border-t border-[#d6ddc1] pt-5 text-sm text-[#6f765f]">
+            &copy; {new Date().getFullYear()} {SITE_CONFIG.name}. All rights reserved.
           </div>
         </div>
       </footer>

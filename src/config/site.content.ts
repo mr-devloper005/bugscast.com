@@ -2,69 +2,69 @@ import type { TaskKey } from '@/lib/site-config'
 
 export const siteContent = {
   navbar: {
-    tagline: 'Independent reading platform',
+    tagline: 'Saved links',
   },
   footer: {
-    tagline: 'Stories, resources, and discoverable posts',
+    tagline: 'Bookmarks, references, and discovery lanes',
   },
   hero: {
-    badge: 'Latest stories and visuals',
-    title: ['A thoughtful home for', 'stories, visuals, and discovery.'],
+    badge: 'Saved links and reference pages',
+    title: ['A curated home for', 'bookmarks, references, and discovery.'],
     description:
-      'Explore fresh articles, image-led posts, and discoverable content across the platform through a calmer and clearer browsing experience.',
+      'Explore saved links, document references, and supporting content through a warmer browsing experience built around social bookmarking.',
     primaryCta: {
-      label: 'Read latest stories',
-      href: '/articles',
+      label: 'Open bookmarks',
+      href: '/sbm',
     },
     secondaryCta: {
-      label: 'Explore visuals',
-      href: '/images',
+      label: 'Browse PDFs',
+      href: '/pdf',
     },
-    searchPlaceholder: 'Search stories, visuals, listings, and more',
+    searchPlaceholder: 'Search bookmarks, PDFs, articles, and more',
     focusLabel: 'Focus',
-    featureCardBadge: 'latest cover rotation',
-    featureCardTitle: 'Latest posts shape the visual identity of the homepage.',
+    featureCardBadge: 'curated board',
+    featureCardTitle: 'Saved links shape the visual identity of the homepage.',
     featureCardDescription:
-      'Recent images and stories stay at the center of the experience without changing any core platform behavior.',
+      'Bookmarks stay at the center of the experience without changing any core platform behavior.',
   },
   home: {
     metadata: {
-      title: 'Stories, visuals, and discoverable content',
+      title: 'Social bookmarking and curated reference pages',
       description:
-        'Explore articles, images, listings, and curated posts through a cleaner reading-first experience.',
-      openGraphTitle: 'Stories, visuals, and discoverable content',
+        'Explore bookmarks, documents, articles, and supporting resources through a calm social bookmarking experience.',
+      openGraphTitle: 'Social bookmarking and curated reference pages',
       openGraphDescription:
-        'Discover articles, visual posts, and connected content through a calmer reading-first experience.',
-      keywords: ['story platform', 'article site', 'visual content', 'content discovery'],
+        'Discover bookmarks, documents, and supporting content through a calmer discovery experience.',
+      keywords: ['social bookmarking', 'bookmark site', 'document library', 'content discovery'],
     },
     introBadge: 'About the platform',
-    introTitle: 'Built for reading, browsing, and connecting different kinds of content.',
+    introTitle: 'Built for bookmarking, browsing, and connecting different kinds of references.',
     introParagraphs: [
-      'This site brings together article-style reading, visual browsing, and structured discovery so visitors can move naturally between different content types.',
-      'Instead of separating stories, visuals, and supporting resources into disconnected surfaces, the platform keeps them connected in one place with consistent navigation and easier exploration.',
-      'Whether someone starts with a story, an image-led post, a listing, or a resource page, they can keep discovering related content without friction.',
+      'This site brings together social bookmarking, document browsing, and structured discovery so visitors can move naturally between saved links and supporting references.',
+      'Instead of separating bookmarks, articles, PDFs, and related resources into disconnected surfaces, the platform keeps them connected in one place with consistent navigation and easier exploration.',
+      'Whether someone starts with a saved link, a document, or a reference page, they can keep discovering related content without friction.',
     ],
     sideBadge: 'At a glance',
     sidePoints: [
-      'Reading-first homepage with stronger emphasis on stories and imagery.',
-      'Connected sections for articles, visuals, listings, and supporting resources.',
-      'Cleaner browsing rhythm designed to make exploration feel easier.',
+      'Bookmark-first homepage with stronger emphasis on saved links.',
+      'Connected sections for articles, PDFs, and supporting reference pages.',
+      'Cleaner browsing rhythm designed to keep scanning easy.',
       'Lightweight interactions that keep the experience fast and readable.',
     ],
     primaryLink: {
-      label: 'Browse articles',
-      href: '/articles',
+      label: 'Browse bookmarks',
+      href: '/sbm',
     },
     secondaryLink: {
-      label: 'See visuals',
-      href: '/images',
+      label: 'See PDFs',
+      href: '/pdf',
     },
   },
   cta: {
     badge: 'Start exploring',
-    title: 'Explore articles, visuals, and resources through one connected experience.',
+    title: 'Explore bookmarks, articles, PDFs, and resources through one connected experience.',
     description:
-      'Move between articles, image-led posts, listings, and resources through one clearer and more connected visual system.',
+      'Move between saved links, reference pages, documents, and supporting resources through one clearer and more connected visual system.',
     primaryCta: {
       label: 'Get Started Free',
       href: '/register',
@@ -182,13 +182,13 @@ export const taskIntroCopy: Record<
     title: 'Curated links and bookmarked resources',
     paragraphs: [
       'This section collects useful links, references, tools, and saved resources in a text-first browsing format.',
-      'Bookmarks stay connected to the rest of the platform, making it easier to move from a saved link into related stories, listings, or resources.',
+      'Bookmarks stay connected to the rest of the platform, making it easier to move from a saved link into related articles, PDFs, or reference pages.',
       'Use this section to organize helpful sources and discover connected content without leaving the broader site experience.',
     ],
     links: [
       { label: 'Browse articles', href: '/articles' },
-      { label: 'Explore listings', href: '/listings' },
       { label: 'Open PDFs', href: '/pdf' },
+      { label: 'Explore profiles', href: '/profile' },
     ],
   },
   pdf: {

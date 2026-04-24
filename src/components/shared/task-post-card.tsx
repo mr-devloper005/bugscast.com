@@ -27,7 +27,7 @@ const getExcerpt = (value?: string | null, maxLength = 140) => {
   const text = stripHtml(value)
   if (!text) return ''
   if (text.length <= maxLength) return text
-  return `${text.slice(0, maxLength).trimEnd()}…`
+  return `${text.slice(0, maxLength).trimEnd()}...`
 }
 
 const getContent = (post: SitePost): ListingContent => {
@@ -109,6 +109,38 @@ export function TaskPostCard({
   const imageAspect = variant === 'image' ? 'aspect-[4/5]' : variant === 'article' ? 'aspect-[16/10]' : variant === 'pdf' ? 'aspect-[4/5]' : variant === 'classified' ? 'aspect-[16/11]' : 'aspect-[4/3]'
   const altText = `${post.title} ${category} ${variant === 'listing' ? 'business listing' : variant} image`
   const imageSizes = variant === 'article' ? '(max-width: 640px) 90vw, (max-width: 1024px) 48vw, 420px' : variant === 'image' ? '(max-width: 640px) 82vw, (max-width: 1024px) 34vw, 320px' : '(max-width: 640px) 85vw, (max-width: 1024px) 42vw, 340px'
+  const taskStyle: { frame: string; muted: string; title: string; badge: string; cta: string } =
+    variant === 'sbm' || variant === 'social'
+      ? {
+          frame: 'rounded-[1.8rem] border border-[#d6ddc1] bg-[#fcfaef] shadow-[0_18px_50px_rgba(73,88,50,0.08)] hover:-translate-y-1 hover:shadow-[0_24px_64px_rgba(73,88,50,0.12)]',
+          muted: 'text-[#5f6650]',
+          title: 'text-[#27301f]',
+          badge: 'bg-[#27301f] text-[#fbf7eb]',
+          cta: 'text-[#27301f]',
+        }
+      : variant === 'pdf'
+        ? {
+            frame: 'rounded-[1.8rem] border border-[#d6ddc1] bg-white shadow-[0_18px_50px_rgba(73,88,50,0.08)] hover:-translate-y-1 hover:shadow-[0_24px_64px_rgba(73,88,50,0.12)]',
+            muted: 'text-[#5f6650]',
+            title: 'text-[#27301f]',
+            badge: 'bg-[#9ab17a] text-[#27301f]',
+            cta: 'text-[#27301f]',
+          }
+        : variant === 'article'
+          ? {
+              frame: 'rounded-[1.9rem] border border-[#d8ccb9] bg-[#fffdf8] shadow-[0_18px_55px_rgba(91,56,37,0.08)] hover:-translate-y-1 hover:shadow-[0_26px_70px_rgba(91,56,37,0.12)]',
+              muted: 'text-[#6f5a4d]',
+              title: 'text-[#2a1a13]',
+              badge: 'bg-[#2a1a13] text-[#fff4df]',
+            cta: 'text-[#2a1a13]',
+          }
+        : {
+            frame: visualVariant.frame,
+            muted: visualVariant.muted,
+            title: visualVariant.title,
+            badge: visualVariant.badge,
+            cta: visualVariant.title,
+          }
 
   const { recipe } = getFactoryState()
   const isDirectoryProduct = recipe.homeLayout === 'listing-home' || recipe.homeLayout === 'classified-home'
@@ -161,45 +193,75 @@ export function TaskPostCard({
     )
   }
 
-  if (isBookmarkVariant) {
+  if (variant === 'pdf') {
     return (
-      <Link href={href} className={`group flex h-full flex-row items-start gap-4 overflow-hidden p-5 transition duration-300 ${visualVariant.frame}`}>
-        <div className="mt-1 rounded-full bg-white/10 p-2.5 text-current transition group-hover:scale-105">
-          <ExternalLink className="h-4 w-4" />
-        </div>
-        <div className="min-w-0 flex-1">
-          <div className="flex flex-wrap items-center gap-2">
-            <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] ${visualVariant.badge}`}>
-              <Tag className="h-3.5 w-3.5" />
+      <Link href={href} className={`group flex h-full flex-col overflow-hidden transition duration-300 ${taskStyle.frame}`}>
+        <div className="relative aspect-[4/3] overflow-hidden bg-[#edf1df]">
+          <ContentImage src={image} alt={altText} fill sizes={imageSizes} quality={75} className="object-cover transition-transform duration-500 group-hover:scale-[1.04]" intrinsicWidth={960} intrinsicHeight={720} />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#27301f]/48 via-transparent to-transparent" />
+          <div className="absolute inset-x-4 top-4 flex items-center justify-between gap-3">
+            <span className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] ${taskStyle.badge}`}>
+              <FileText className="h-3.5 w-3.5" />
+              PDF
+            </span>
+            <span className="rounded-full bg-white/90 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-[#27301f]">
               {category}
             </span>
-            {content.location ? <span className={`inline-flex items-center gap-1 text-xs ${visualVariant.muted}`}><MapPin className="h-3.5 w-3.5" />{content.location}</span> : null}
           </div>
-          <h3 className={`mt-3 line-clamp-2 text-lg font-semibold leading-snug group-hover:opacity-85 ${visualVariant.title}`}>{post.title}</h3>
-          <p className={`mt-2 line-clamp-3 text-sm leading-7 ${visualVariant.muted}`}>{getExcerpt(content.description || post.summary, compact ? 120 : 180) || 'Explore this bookmark.'}</p>
-          {content.email ? <div className={`mt-3 inline-flex items-center gap-1 text-xs ${visualVariant.muted}`}><Mail className="h-3.5 w-3.5" />{content.email}</div> : null}
+        </div>
+        <div className="flex flex-1 flex-col p-5">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#7b8467]">Document</p>
+          <h3 className={`mt-2 line-clamp-2 text-lg font-semibold leading-snug ${taskStyle.title}`}>{post.title}</h3>
+          <p className={`mt-3 line-clamp-3 text-sm leading-7 ${taskStyle.muted}`}>{getExcerpt(content.description || post.summary, compact ? 120 : 180) || 'Open this document.'}</p>
+          <div className={`mt-auto pt-4 text-sm font-semibold ${taskStyle.cta}`}>Open file</div>
+        </div>
+      </Link>
+    )
+  }
+
+  if (isBookmarkVariant) {
+    return (
+      <Link href={href} className={`group flex h-full flex-col overflow-hidden p-5 transition duration-300 ${taskStyle.frame}`}>
+        <div className="flex items-start gap-4">
+          <div className="rounded-full bg-[#27301f] p-2.5 text-[#fbf7eb] transition group-hover:scale-105">
+            <ExternalLink className="h-4 w-4" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] ${taskStyle.badge}`}>
+                <Tag className="h-3.5 w-3.5" />
+                {category}
+              </span>
+              {content.location ? <span className={`inline-flex items-center gap-1 text-xs ${taskStyle.muted}`}><MapPin className="h-3.5 w-3.5" />{content.location}</span> : null}
+            </div>
+            <h3 className={`mt-3 line-clamp-2 text-lg font-semibold leading-snug group-hover:opacity-85 ${taskStyle.title}`}>{post.title}</h3>
+            <p className={`mt-2 line-clamp-3 text-sm leading-7 ${taskStyle.muted}`}>{getExcerpt(content.description || post.summary, compact ? 120 : 180) || 'Explore this bookmark.'}</p>
+          </div>
+        </div>
+        <div className="mt-4 flex items-center justify-between gap-3 border-t border-[#d6ddc1] pt-4">
+          {content.email ? <div className={`inline-flex items-center gap-1 text-xs ${taskStyle.muted}`}><Mail className="h-3.5 w-3.5" />{content.email}</div> : <span className="text-xs uppercase tracking-[0.18em] text-[#7b8467]">Saved reference</span>}
+          <span className={`text-sm font-semibold ${taskStyle.cta}`}>Open link</span>
         </div>
       </Link>
     )
   }
 
   return (
-    <Link href={href} className={`group flex h-full flex-col overflow-hidden transition duration-300 ${visualVariant.frame}`}>
+    <Link href={href} className={`group flex h-full flex-col overflow-hidden transition duration-300 ${taskStyle.frame}`}>
       <div className={`relative ${imageAspect} overflow-hidden bg-[#ede2dc]`}>
         <ContentImage src={image} alt={altText} fill sizes={imageSizes} quality={75} className="object-cover transition-transform duration-500 group-hover:scale-[1.04]" intrinsicWidth={960} intrinsicHeight={720} />
         <div className="absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-transparent opacity-80" />
-        <span className={`absolute left-4 top-4 inline-flex items-center gap-1 rounded-full px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] ${visualVariant.badge}`}>
+        <span className={`absolute left-4 top-4 inline-flex items-center gap-1 rounded-full px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] ${taskStyle.badge}`}>
           <Tag className="h-3.5 w-3.5" />
           {category}
         </span>
-        {variant === 'pdf' && <span className="absolute right-4 top-4 inline-flex items-center gap-1 rounded-full bg-white/88 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-950 shadow"><FileText className="h-3.5 w-3.5" />PDF</span>}
       </div>
       <div className={`flex flex-1 flex-col p-5 ${compact ? 'py-4' : ''}`}>
-        <h3 className={`line-clamp-2 font-semibold leading-snug ${variant === 'article' ? 'text-[1.35rem]' : 'text-lg'} ${visualVariant.title}`}>{post.title}</h3>
-        <p className={`mt-3 text-sm leading-7 ${variant === 'article' ? 'line-clamp-4' : 'line-clamp-3'} ${visualVariant.muted}`}>{getExcerpt(content.description || post.summary) || 'Explore this post.'}</p>
+        <h3 className={`line-clamp-2 font-semibold leading-snug ${variant === 'article' ? 'text-[1.35rem]' : 'text-lg'} ${taskStyle.title}`}>{post.title}</h3>
+        <p className={`mt-3 text-sm leading-7 ${variant === 'article' ? 'line-clamp-4' : 'line-clamp-3'} ${taskStyle.muted}`}>{getExcerpt(content.description || post.summary) || 'Explore this post.'}</p>
         <div className="mt-auto pt-4">
-          {content.location && <div className={`inline-flex items-center gap-1 text-xs ${visualVariant.muted}`}><MapPin className="h-3.5 w-3.5" />{content.location}</div>}
-          {content.email && <div className={`mt-2 inline-flex items-center gap-1 text-xs ${visualVariant.muted}`}><Mail className="h-3.5 w-3.5" />{content.email}</div>}
+          {content.location && <div className={`inline-flex items-center gap-1 text-xs ${taskStyle.muted}`}><MapPin className="h-3.5 w-3.5" />{content.location}</div>}
+          {content.email && <div className={`mt-2 inline-flex items-center gap-1 text-xs ${taskStyle.muted}`}><Mail className="h-3.5 w-3.5" />{content.email}</div>}
         </div>
       </div>
     </Link>
