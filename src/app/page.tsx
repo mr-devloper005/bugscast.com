@@ -1,12 +1,12 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { ArrowRight, Bookmark, Building2, Compass, FileText, Globe2, Image as ImageIcon, LayoutGrid, MapPin, ShieldCheck, Tag, User } from 'lucide-react'
+import { ArrowRight, Bookmark, Building2, ChevronRight, Compass, FileText, Globe2, Image as ImageIcon, LayoutGrid, MapPin, ShieldCheck, Sparkles, Tag, User } from 'lucide-react'
 import { ContentImage } from '@/components/shared/content-image'
 import { NavbarShell } from '@/components/shared/navbar-shell'
 import { Footer } from '@/components/shared/footer'
 import { SchemaJsonLd } from '@/components/seo/schema-jsonld'
 import { TaskPostCard } from '@/components/shared/task-post-card'
-import { SITE_CONFIG, type TaskKey } from '@/lib/site-config'
+import { SITE_CONFIG, type TaskConfig, type TaskKey } from '@/lib/site-config'
 import { buildPageMetadata } from '@/lib/seo'
 import { fetchTaskPosts } from '@/lib/task-data'
 import { siteContent } from '@/config/site.content'
@@ -39,6 +39,10 @@ const taskIcons: Record<TaskKey, any> = {
   classified: Tag,
   image: ImageIcon,
   profile: User,
+  social: LayoutGrid,
+  pdf: FileText,
+  org: Building2,
+  comment: FileText,
 }
 
 function resolveTaskKey(value: unknown, fallback: TaskKey): TaskKey {
@@ -247,14 +251,14 @@ function DirectoryHome({ primaryTask, enabledTasks, listingPosts, classifiedPost
           <div className="grid gap-4 md:grid-cols-2">
             {(profilePosts.length ? profilePosts : classifiedPosts).slice(0, 4).map((post) => {
               const meta = getPostMeta(post)
-              const taskKey = resolveTaskKey(post.task, profilePosts.length ? 'profile' : 'classified')
+              const taskKey = resolveTaskKey((post as any).task, profilePosts.length ? 'profile' : 'classified')
               return (
                 <Link key={post.id} href={getTaskHref(taskKey, post.slug)} className={`overflow-hidden rounded-[1.8rem] ${tone.panel}`}>
                   <div className="relative h-44 overflow-hidden">
                     <ContentImage src={getPostImage(post)} alt={post.title} fill className="object-cover" />
                   </div>
                   <div className="p-5">
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.24em] opacity-70">{meta.category || post.task || 'Profile'}</p>
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.24em] opacity-70">{meta.category || (post as any).task || 'Profile'}</p>
                     <h3 className="mt-2 text-xl font-semibold">{post.title}</h3>
                     <p className={`mt-2 text-sm leading-7 ${tone.muted}`}>{post.summary || 'Quick access to local information and related surfaces.'}</p>
                   </div>
@@ -375,7 +379,7 @@ function VisualHome({ primaryTask, imagePosts, profilePosts, articlePosts }: { p
             {gallery.slice(0, 5).map((post, index) => (
               <Link
                 key={post.id}
-                href={getTaskHref(resolveTaskKey(post.task, 'image'), post.slug)}
+                href={getTaskHref(resolveTaskKey((post as any).task, 'image'), post.slug)}
                 className={index === 0 ? `col-span-2 row-span-2 overflow-hidden rounded-[2.4rem] ${tone.panel}` : `overflow-hidden rounded-[1.8rem] ${tone.soft}`}
               >
                 <div className={index === 0 ? 'relative h-[360px]' : 'relative h-[170px]'}>
@@ -409,62 +413,69 @@ function VisualHome({ primaryTask, imagePosts, profilePosts, articlePosts }: { p
   )
 }
 
-function CurationHome({ primaryTask, bookmarkPosts, profilePosts, articlePosts }: { primaryTask?: EnabledTask; bookmarkPosts: SitePost[]; profilePosts: SitePost[]; articlePosts: SitePost[] }) {
+function CurationHome({
+  primaryTask,
+  bookmarkPosts,
+  articlePosts,
+}: {
+  primaryTask?: EnabledTask
+  bookmarkPosts: SitePost[]
+  articlePosts: SitePost[]
+}) {
   const tone = getCurationTone()
-  const collections = bookmarkPosts.length ? bookmarkPosts.slice(0, 4) : articlePosts.slice(0, 4)
-  const people = profilePosts.slice(0, 3)
+  const featuredBookmarks = bookmarkPosts.slice(0, 4)
+  const featuredArticles = articlePosts.slice(0, 3)
 
   return (
     <main className={tone.shell}>
       <section className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8 lg:py-18">
-        <div className="grid gap-8 lg:grid-cols-[1fr_1fr] lg:items-start">
+        <div className="grid gap-8 lg:grid-cols-[1.08fr_0.92fr] lg:items-start">
           <div>
             <span className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.24em] ${tone.badge}`}>
               <Bookmark className="h-3.5 w-3.5" />
-              Curated collections
+              Social bookmarking
             </span>
             <h1 className={`mt-6 max-w-4xl text-5xl font-semibold tracking-[-0.06em] sm:text-6xl ${tone.title}`}>
-              Save, organize, and revisit resources through shelves, boards, and curated collections.
+              Curated links, saved notes, and reference pages arranged like a warm working board.
             </h1>
-            <p className={`mt-6 max-w-2xl text-base leading-8 ${tone.muted}`}>{SITE_CONFIG.description}</p>
+            <p className={`mt-6 max-w-2xl text-base leading-8 ${tone.muted}`}>
+              {SITE_CONFIG.description}
+            </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link href={primaryTask?.route || '/sbm'} className={`inline-flex items-center gap-2 rounded-full px-5 py-3 text-sm font-semibold ${tone.action}`}>
-                Open collections
+                Open bookmarks
                 <ArrowRight className="h-4 w-4" />
               </Link>
-              <Link href="/profile" className={`inline-flex items-center gap-2 rounded-full px-5 py-3 text-sm font-semibold ${tone.actionAlt}`}>
-                Explore curators
+              <Link href="/sbm/submit" className={`inline-flex items-center gap-2 rounded-full px-5 py-3 text-sm font-semibold ${tone.actionAlt}`}>
+                Submit a link
               </Link>
             </div>
           </div>
-
-          <div className="grid gap-4 md:grid-cols-2">
-            {collections.map((post) => (
-              <Link key={post.id} href={getTaskHref(resolveTaskKey(post.task, 'sbm'), post.slug)} className={`rounded-[1.8rem] p-6 ${tone.panel}`}>
-                <p className="text-xs font-semibold uppercase tracking-[0.24em] opacity-70">Collection</p>
-                <h3 className="mt-3 text-2xl font-semibold">{post.title}</h3>
-                <p className={`mt-3 text-sm leading-8 ${tone.muted}`}>{post.summary || 'A calmer bookmark surface with room for context and grouping.'}</p>
-              </Link>
-            ))}
-          </div>
         </div>
 
-        <div className="mt-12 grid gap-6 lg:grid-cols-[1.05fr_0.95fr]">
-          <div className={`rounded-[2rem] p-7 ${tone.panel}`}>
-            <p className="text-xs font-semibold uppercase tracking-[0.24em] opacity-70">Why this feels different</p>
-            <h2 className="mt-3 text-3xl font-semibold tracking-[-0.04em]">More like saved boards and reading shelves than a generic post feed.</h2>
-            <p className={`mt-4 max-w-2xl text-sm leading-8 ${tone.muted}`}>The structure is calmer, the cards are less noisy, and the page encourages collecting and returning instead of forcing everything into a fast-scrolling list.</p>
+        <div className="mt-12 grid gap-6 lg:grid-cols-[0.98fr_1.02fr] lg:items-start">
+          <div className={`rounded-[2.2rem] p-7 ${tone.panel}`}>
+            <div className="flex items-center justify-between gap-4">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.24em] opacity-70">Pinned bookmarks</p>
+                <h2 className="mt-3 text-3xl font-semibold tracking-[-0.04em]">The primary board stays centered on saved links.</h2>
+              </div>
+              <Sparkles className="h-5 w-5 opacity-70" />
+            </div>
+            <div className="mt-6 grid gap-4 md:grid-cols-2">
+              {featuredBookmarks.map((post) => (
+                <TaskPostCard key={post.id} post={post} href={getTaskHref(resolveTaskKey((post as any).task, 'sbm'), post.slug)} taskKey="sbm" compact />
+              ))}
+            </div>
           </div>
-          <div className="grid gap-4 md:grid-cols-3">
-            {people.map((post) => (
-              <Link key={post.id} href={`/profile/${post.slug}`} className={`rounded-[1.8rem] p-5 ${tone.soft}`}>
-                <div className="relative h-32 overflow-hidden rounded-[1.2rem]">
-                  <ContentImage src={getPostImage(post)} alt={post.title} fill className="object-cover" />
-                </div>
-                <h3 className="mt-4 text-lg font-semibold">{post.title}</h3>
-                <p className={`mt-2 text-sm leading-7 ${tone.muted}`}>Curator profile, saved resources, and collection notes.</p>
-              </Link>
-            ))}
+
+          <div className={`rounded-[2.2rem] p-7 ${tone.panel}`}>
+            <p className="text-xs font-semibold uppercase tracking-[0.24em] opacity-70">Reference lanes</p>
+            <div className="mt-6 space-y-4">
+              {featuredArticles.map((post) => (
+                <TaskPostCard key={post.id} post={post} href={getTaskHref(resolveTaskKey((post as any).task, 'article'), post.slug)} taskKey="article" compact />
+              ))}
+            </div>
           </div>
         </div>
       </section>
@@ -484,19 +495,35 @@ export default async function HomePage() {
     await Promise.all(
       enabledTasks.map(async (task) => ({
         task,
-        posts: await fetchTaskPosts(task.key, 8, { allowMockFallback: false, fresh: true }),
+        posts: await fetchTaskPosts(task.key, 8, {
+          allowMockFallback:
+            productKind === 'curation' && (task.key === 'sbm' || task.key === 'article'),
+          fresh: true,
+        }),
       }))
     )
   ).filter(({ posts }) => posts.length)
 
   const primaryTask = enabledTasks.find((task) => task.key === recipe.primaryTask) || enabledTasks[0]
   const supportTasks = enabledTasks.filter((task) => task.key !== primaryTask?.key)
+  const curationTaskFeed: TaskFeedItem[] =
+    productKind === 'curation'
+      ? (
+          await Promise.all(
+            (['article'] as TaskKey[]).map(async (taskKey) => ({
+              task: SITE_CONFIG.tasks.find((task) => task.key === taskKey)!,
+              posts: await fetchTaskPosts(taskKey, 6, { allowMockFallback: true, fresh: true }),
+            }))
+          )
+        ).filter(({ posts }) => posts.length)
+      : []
   const listingPosts = taskFeed.find(({ task }) => task.key === 'listing')?.posts || []
   const classifiedPosts = taskFeed.find(({ task }) => task.key === 'classified')?.posts || []
   const articlePosts = taskFeed.find(({ task }) => task.key === 'article')?.posts || []
   const imagePosts = taskFeed.find(({ task }) => task.key === 'image')?.posts || []
   const profilePosts = taskFeed.find(({ task }) => task.key === 'profile')?.posts || []
   const bookmarkPosts = taskFeed.find(({ task }) => task.key === 'sbm')?.posts || []
+  const curationArticlePosts = curationTaskFeed.find(({ task }) => task.key === 'article')?.posts || []
 
   const schemaData = [
     {
@@ -541,7 +568,11 @@ export default async function HomePage() {
         <VisualHome primaryTask={primaryTask} imagePosts={imagePosts} profilePosts={profilePosts} articlePosts={articlePosts} />
       ) : null}
       {productKind === 'curation' ? (
-        <CurationHome primaryTask={primaryTask} bookmarkPosts={bookmarkPosts} profilePosts={profilePosts} articlePosts={articlePosts} />
+        <CurationHome
+          primaryTask={primaryTask}
+          bookmarkPosts={bookmarkPosts}
+          articlePosts={curationArticlePosts}
+        />
       ) : null}
       <Footer />
     </div>

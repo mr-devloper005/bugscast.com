@@ -72,11 +72,11 @@ const taskTitles: Record<TaskKey, string[]> = {
     "Zenith Partners",
   ],
   sbm: [
-    "SEO Checklist 2026",
-    "Directory Growth Tactics",
-    "Backlink Outreach Vault",
-    "AI Writing Tools List",
-    "Local Listing Audit",
+    "Google Search Console Setup Guide",
+    "High-Authority Directory List 2026",
+    "Local SEO Citation Tracker Sheet",
+    "Programmatic SEO Keyword Ideas",
+    "Backlink Prospecting Workflow",
   ],
   comment: [
     "Reply: Agency Growth Stack",
@@ -93,10 +93,10 @@ const taskCategories: Record<TaskKey, string[]> = {
   article: ["Strategy", "SEO", "Product", "Growth", "Ops"],
   image: ["Lifestyle", "Travel", "Studio", "Urban", "Minimal"],
   profile: ["Founder", "Creator", "Agency", "Team", "Consultant"],
-  social: ["Community", "News", "Updates", "Events", "Insights"],
+  social: ["Social Media", "News", "Event", "Digital", "Lifestyle"],
   pdf: ["Guides", "Playbooks", "Templates", "Reports", "Docs"],
   org: ["Agency", "Studio", "Collective", "Partner", "Network"],
-  sbm: ["Bookmarks", "Tools", "Resources", "SEO", "Research"],
+  sbm: ["Technology", "Business", "Digital", "News", "Social Media"],
   comment: ["Opinion", "Reply", "Discussion", "Feedback", "Debate"],
 };
 
@@ -128,6 +128,10 @@ export const getMockPostsForTask = (task: TaskKey): SitePost[] => {
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/(^-|-$)/g, "");
 
+    const publishedAt = new Date(Date.now() - index * 18 * 60 * 1000).toISOString();
+    const website =
+      task === "sbm" ? `https://example.com/resources/${slug}` : "https://example.com";
+
     return {
       id: `${task}-mock-${index + 1}`,
       title,
@@ -138,13 +142,13 @@ export const getMockPostsForTask = (task: TaskKey): SitePost[] => {
         category,
         location: "Delhi",
         description: summaryByTask[task],
-        website: "https://example.com",
+        website,
         phone: "+91-9999999999",
       },
       media: [{ url: buildImage(task, index), type: "IMAGE" }],
       tags: [task, category],
       authorName: "Site Master Pro",
-      publishedAt: new Date().toISOString(),
+      publishedAt,
     };
   });
 };
