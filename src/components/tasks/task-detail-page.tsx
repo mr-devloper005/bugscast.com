@@ -1,3 +1,6 @@
+'use client';
+
+import React from 'react';
 import { ContentImage } from "@/components/shared/content-image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -62,6 +65,76 @@ const formatArticleHtml = (content: PostContent, post: SitePost) => {
 
   return formatRichHtml(raw, "Details coming soon.");
 };
+
+// Bookmark Detail Content Component
+function BookmarkDetailContent({ 
+  post, 
+  category, 
+  descriptionHtml, 
+  postTags,
+  content,
+  location 
+}: { 
+  post: SitePost; 
+  category: string; 
+  descriptionHtml: string; 
+  postTags: string[];
+  content: PostContent;
+  location: string | undefined;
+}) {
+  return (
+    <div className="mx-auto w-full max-w-4xl text-center py-12">
+      <div className="mb-6 inline-flex items-center gap-2 text-sm text-muted-foreground">
+        <Badge variant="secondary" className="inline-flex items-center gap-1">
+          <Tag className="h-3.5 w-3.5" />
+          {category}
+        </Badge>
+        {location && (
+          <span className="inline-flex items-center gap-1">
+            <MapPin className="h-4 w-4" />
+            {location}
+          </span>
+        )}
+      </div>
+      <h1 className="mb-6 text-4xl font-bold text-foreground leading-tight">
+        {post.title}
+      </h1>
+      <div className="mb-8 max-w-2xl mx-auto">
+        <RichContent html={formatRichHtml(descriptionHtml, "Details coming soon.")} className="text-lg text-muted-foreground leading-relaxed" />
+      </div>
+      
+      {content.website && (
+        <div className="mb-8">
+          <Button 
+            size="lg" 
+            className="px-8 py-3 text-base font-medium"
+            asChild
+          >
+            <a 
+              href={content.website} 
+              target="_blank" 
+              rel="noreferrer"
+              className="inline-flex items-center gap-2"
+            >
+              <Globe className="h-5 w-5" />
+              Visit Website
+            </a>
+          </Button>
+        </div>
+      )}
+      
+      {postTags.length > 0 && (
+        <div className="flex flex-wrap justify-center gap-2">
+          {postTags.map((tag) => (
+            <Badge key={tag} variant="outline" className="text-sm">
+              {tag}
+            </Badge>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 
 const getImageUrls = (post: SitePost, content: PostContent) => {
   const media = Array.isArray(post.media) ? post.media : [];
@@ -316,22 +389,33 @@ export async function TaskDetailPage({ task, slug }: { task: TaskKey; slug: stri
                   </div>
                 ) : null}
 
-                <div className={cn(isClassified ? "mx-auto w-full max-w-4xl" : "mt-6")}>
-                  <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
-                    <Badge variant="secondary" className="inline-flex items-center gap-1">
-                      <Tag className="h-3.5 w-3.5" />
-                      {category}
-                    </Badge>
-                    {location && (
-                      <span className="inline-flex items-center gap-1">
-                        <MapPin className="h-4 w-4" />
-                        {location}
-                      </span>
-                    )}
+                {isBookmark ? (
+                  <BookmarkDetailContent 
+                    post={post} 
+                    category={category} 
+                    descriptionHtml={descriptionHtml} 
+                    postTags={postTags}
+                    content={content}
+                    location={location}
+                  />
+                ) : (
+                  <div className={cn(isClassified ? "mx-auto w-full max-w-4xl" : "mt-6")}>
+                    <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
+                      <Badge variant="secondary" className="inline-flex items-center gap-1">
+                        <Tag className="h-3.5 w-3.5" />
+                        {category}
+                      </Badge>
+                      {location && (
+                        <span className="inline-flex items-center gap-1">
+                          <MapPin className="h-4 w-4" />
+                          {location}
+                        </span>
+                      )}
+                    </div>
+                    <h1 className="mt-4 text-3xl font-semibold text-foreground">{post.title}</h1>
+                    <RichContent html={descriptionHtml} className="mt-3 max-w-3xl" />
                   </div>
-                  <h1 className="mt-4 text-3xl font-semibold text-foreground">{post.title}</h1>
-                  <RichContent html={descriptionHtml} className="mt-3 max-w-3xl" />
-                </div>
+                )}
               </>
             ) : null}
 
@@ -475,67 +559,69 @@ export async function TaskDetailPage({ task, slug }: { task: TaskKey; slug: stri
           ) : null}
         </div>
 
-        <section className="mt-12">
-          {related.length ? (
-            <>
-            <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-xl font-semibold text-foreground">
-                More in {category}
-              </h2>
-              {taskConfig?.route && (
-                <Link
-                  href={taskConfig.route}
-                  className="text-sm text-muted-foreground hover:text-foreground"
-                >
-                  View all
-                </Link>
-              )}
-            </div>
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {related.map((item) => (
-                <TaskPostCard
-                  key={item.id}
-                  post={item}
-                  href={buildPostUrl(task, item.slug)}
-                />
-              ))}
-            </div>
-            </>
-          ) : null}
-          <nav className="mt-6 rounded-2xl border border-border bg-card/60 p-4">
-            <p className="text-sm font-semibold text-foreground">Related links</p>
-            <ul className="mt-2 space-y-2 text-sm">
-              {related.map((item) => (
-                <li key={`link-${item.id}`}>
-                  <Link
-                    href={buildPostUrl(task, item.slug)}
-                    className="text-primary underline-offset-4 hover:underline"
-                  >
-                    {item.title}
-                  </Link>
-                </li>
-              ))}
-              {taskConfig?.route ? (
-                <li>
+        {!isBookmark && (
+          <section className="mt-12">
+            {related.length ? (
+              <>
+              <div className="mb-4 flex items-center justify-between">
+                <h2 className="text-xl font-semibold text-foreground">
+                  More in {category}
+                </h2>
+                {taskConfig?.route && (
                   <Link
                     href={taskConfig.route}
+                    className="text-sm text-muted-foreground hover:text-foreground"
+                  >
+                    View all
+                  </Link>
+                )}
+              </div>
+              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                {related.map((item) => (
+                  <TaskPostCard
+                    key={item.id}
+                    post={item}
+                    href={buildPostUrl(task, item.slug)}
+                  />
+                ))}
+              </div>
+              </>
+            ) : null}
+            <nav className="mt-6 rounded-2xl border border-border bg-card/60 p-4">
+              <p className="text-sm font-semibold text-foreground">Related links</p>
+              <ul className="mt-2 space-y-2 text-sm">
+                {related.map((item) => (
+                  <li key={`link-${item.id}`}>
+                    <Link
+                      href={buildPostUrl(task, item.slug)}
+                      className="text-primary underline-offset-4 hover:underline"
+                    >
+                      {item.title}
+                    </Link>
+                  </li>
+                ))}
+                {taskConfig?.route ? (
+                  <li>
+                    <Link
+                      href={taskConfig.route}
+                      className="text-primary underline-offset-4 hover:underline"
+                    >
+                      Browse all {taskConfig.label}
+                    </Link>
+                  </li>
+                ) : null}
+                <li>
+                  <Link
+                    href={`/search?q=${encodeURIComponent(category)}`}
                     className="text-primary underline-offset-4 hover:underline"
                   >
-                    Browse all {taskConfig.label}
+                    Search more in {category}
                   </Link>
                 </li>
-              ) : null}
-              <li>
-                <Link
-                  href={`/search?q=${encodeURIComponent(category)}`}
-                  className="text-primary underline-offset-4 hover:underline"
-                >
-                  Search more in {category}
-                </Link>
-              </li>
-            </ul>
-          </nav>
-        </section>
+              </ul>
+            </nav>
+          </section>
+        )}
       </main>
       <Footer />
     </div>
