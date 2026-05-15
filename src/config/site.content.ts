@@ -5,7 +5,7 @@ export const siteContent = {
     tagline: 'Saved links',
   },
   footer: {
-    tagline: 'Bookmarks, references, and discovery lanes',
+    tagline: '',
   },
   hero: {
     badge: 'Saved links and reference pages',
@@ -74,7 +74,7 @@ export const siteContent = {
       href: '/contact',
     },
   },
-  taskSectionHeading: 'Latest {label}',
+  taskSectionHeading: 'Latest Uploads',
   taskSectionDescriptionSuffix: 'Browse the newest posts in this section.',
 } as const
 

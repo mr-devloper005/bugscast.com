@@ -3,12 +3,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { SITE_CONFIG } from "@/lib/site-config";
 
-const highlights = [
-  { label: "Links curated", value: "180k+" },
-  { label: "Collections published", value: "12k+" },
-  { label: "Active categories", value: "35+" },
-];
-
 const values = [
   {
     title: "Bookmark-first product",
@@ -44,14 +38,6 @@ export default function AboutPage() {
               {SITE_CONFIG.name} brings social bookmarking, supporting articles, and reference pages into one connected
               flow so visitors can move from a saved link to deeper context without friction.
             </p>
-            <div className="grid gap-4 sm:grid-cols-3">
-              {highlights.map((item) => (
-                <div key={item.label} className="rounded-lg border border-border bg-secondary/40 p-4">
-                  <div className="text-2xl font-semibold text-foreground">{item.value}</div>
-                  <div className="text-xs text-muted-foreground">{item.label}</div>
-                </div>
-              ))}
-            </div>
           </CardContent>
         </Card>
         <div className="space-y-4">
