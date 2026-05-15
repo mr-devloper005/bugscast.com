@@ -416,25 +416,20 @@ function VisualHome({ primaryTask, imagePosts, profilePosts, articlePosts }: { p
 function CurationHome({
   primaryTask,
   bookmarkPosts,
-  articlePosts,
 }: {
   primaryTask?: EnabledTask
   bookmarkPosts: SitePost[]
-  articlePosts: SitePost[]
 }) {
   const tone = getCurationTone()
   const featuredBookmarks = bookmarkPosts.slice(0, 4)
-  const featuredArticles = articlePosts.slice(0, 3)
+  const latestUploads = bookmarkPosts.slice(4, 8)
+  const latestUploadPosts = latestUploads.length ? latestUploads : featuredBookmarks
 
   return (
     <main className={tone.shell}>
       <section className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8 lg:py-18">
         <div className="grid gap-8 lg:grid-cols-[1.08fr_0.92fr] lg:items-start">
           <div>
-            <span className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.24em] ${tone.badge}`}>
-              <Bookmark className="h-3.5 w-3.5" />
-              Social bookmarking
-            </span>
             <h1 className={`mt-6 max-w-4xl text-5xl font-semibold tracking-[-0.06em] sm:text-6xl ${tone.title}`}>
               Curated links, saved notes, and reference pages arranged like a warm working board.
             </h1>
@@ -470,10 +465,10 @@ function CurationHome({
           </div>
 
           <div className={`rounded-[2.2rem] p-7 ${tone.panel}`}>
-            <p className="text-xs font-semibold uppercase tracking-[0.24em] opacity-70">Reference lanes</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.24em] opacity-70">Latest uploads</p>
             <div className="mt-6 space-y-4">
-              {featuredArticles.map((post) => (
-                <TaskPostCard key={post.id} post={post} href={getTaskHref(resolveTaskKey((post as any).task, 'article'), post.slug)} taskKey="article" compact />
+              {latestUploadPosts.map((post) => (
+                <TaskPostCard key={post.id} post={post} href={getTaskHref(resolveTaskKey((post as any).task, 'sbm'), post.slug)} taskKey="sbm" compact />
               ))}
             </div>
           </div>
@@ -506,24 +501,12 @@ export default async function HomePage() {
 
   const primaryTask = enabledTasks.find((task) => task.key === recipe.primaryTask) || enabledTasks[0]
   const supportTasks = enabledTasks.filter((task) => task.key !== primaryTask?.key)
-  const curationTaskFeed: TaskFeedItem[] =
-    productKind === 'curation'
-      ? (
-          await Promise.all(
-            (['article'] as TaskKey[]).map(async (taskKey) => ({
-              task: SITE_CONFIG.tasks.find((task) => task.key === taskKey)!,
-              posts: await fetchTaskPosts(taskKey, 6, { allowMockFallback: true, fresh: true }),
-            }))
-          )
-        ).filter(({ posts }) => posts.length)
-      : []
   const listingPosts = taskFeed.find(({ task }) => task.key === 'listing')?.posts || []
   const classifiedPosts = taskFeed.find(({ task }) => task.key === 'classified')?.posts || []
   const articlePosts = taskFeed.find(({ task }) => task.key === 'article')?.posts || []
   const imagePosts = taskFeed.find(({ task }) => task.key === 'image')?.posts || []
   const profilePosts = taskFeed.find(({ task }) => task.key === 'profile')?.posts || []
   const bookmarkPosts = taskFeed.find(({ task }) => task.key === 'sbm')?.posts || []
-  const curationArticlePosts = curationTaskFeed.find(({ task }) => task.key === 'article')?.posts || []
 
   const schemaData = [
     {
@@ -571,7 +554,6 @@ export default async function HomePage() {
         <CurationHome
           primaryTask={primaryTask}
           bookmarkPosts={bookmarkPosts}
-          articlePosts={curationArticlePosts}
         />
       ) : null}
       <Footer />

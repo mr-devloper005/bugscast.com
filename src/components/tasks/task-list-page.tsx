@@ -140,6 +140,29 @@ export async function TaskListPage({ task, category }: { task: TaskKey; category
                   Submit link
                 </Link>
               </div>
+              <div className={`mt-6 rounded-[1.4rem] p-4 ${ui.soft}`}>
+                <p className={`text-xs font-semibold uppercase tracking-[0.24em] ${ui.muted}`}>Category-wise search</p>
+                <form className="mt-3 grid gap-3 sm:grid-cols-[1fr_auto] sm:items-end" action={taskConfig?.route || '#'} method="get">
+                  <div>
+                    <label className={`text-xs uppercase tracking-[0.2em] ${ui.muted}`}>Category</label>
+                    <select
+                      name="category"
+                      defaultValue={normalizedCategory}
+                      className={`mt-2 h-11 w-full rounded-xl px-3 text-sm ${ui.input}`}
+                    >
+                      <option value="all">All categories</option>
+                      {CATEGORY_OPTIONS.map((item) => (
+                        <option key={item.slug} value={item.slug}>
+                          {item.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <button type="submit" className={`h-11 rounded-xl px-4 text-sm font-medium ${ui.button}`}>
+                    Search
+                  </button>
+                </form>
+              </div>
             </div>
           </section>
         ) : null}

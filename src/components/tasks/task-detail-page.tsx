@@ -1,5 +1,3 @@
-'use client';
-
 import React from 'react';
 import { ContentImage } from "@/components/shared/content-image";
 import Link from "next/link";
